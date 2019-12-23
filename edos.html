@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>edos</title>
+<style>
+
+body { background: #555 }
+
+.edo12 { background: grey; }
+.edo22 { background: green; }
+.edo10 { background: skyblue; }
+.notes { 
+  width: 1000px;
+  display: flex;
+}
+.notes div {
+  border: 1px solid black; 
+  height: 30px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+</style>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.4.84/Tone.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.4.10/Tone.min.js"></script>
+
+  </head>
+  <body>
+
+    <div class="main">
+      <div class="notes edo12">
+        <div>C</div> <div>C#/Db</div> <div>D</div> <div>D#/Eb</div> <div>E</div> <div>F</div> <div>F#/Gb</div> <div>G</div> <div>G#/Ab</div> <div>A</div> <div>A#/Bb</div> <div>B</div>
+      </div>
+      <div class="notes edo22">
+        <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div> <div>11</div> <div>12</div> <div>13</div> <div>14</div> <div>15</div> <div>16</div> <div>17</div> <div>18</div> <div>19</div> <div>20</div> <div>21</div> <div>22</div>
+      </div>
+      <div class="notes edo10">
+        <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div>  
+      </div>
+    </div>  
+
+    <div class="controls">
+      <button id="startstop">Start/Stop</button>
+
+    </div>
+
+
+
+<script>
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+const synth = new Tone.PolySynth().set({
+                "oscillator" : { "type" : 'triangle' },
+                "envelope" : {
+                  "attack" : 0.005 ,
+                  "decay" : 0.1 ,
+                  "sustain" : 0.3 ,
+                  "release" : 2,
+                },
+                "volume" : 0,
+              }).toMaster();
+
+Tone.Transport.bpm.value = 60;
+
+console.log(Tone.Transport.bpm);
+
+let started = false;
+let division = 22;
+let detune = 0;
+
+function setDetune() {
+  const detune = 1200/division * getRandomInt(0, division+1);
+  console.log('detune', detune);
+  synth.detune.value = detune;
+    
+}
+
+const startStop = document.getElementById('startstop');
+
+
+
+
+//const loop = new Tone.Loop(time => { synth.triggerAttackRelease('C3', '8n') }, "8").start(0);
+
+Tone.Transport.scheduleRepeat(onRepeat, '4n');
+
+function onRepeat(time) {
+  setDetune();
+  synth.triggerAttackRelease('C3', '8n')
+  
+}
+
+
+
+
+const start = () => {
+  console.log('start');
+  started = true;
+  Tone.Transport.start();
+}
+
+const stop = () => {
+  console.log('stopped');
+  started = false;
+  Tone.Transport.stop();
+}
+
+
+
+startStop.addEventListener('click', () => {
+  Tone.context.resume();
+  if (started) { stop(); }
+  else { start(); }
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === ' ') {
+    Tone.context.resume();
+    if (started) { stop(); }
+    else { start(); }
+  } 
+});
+
+
+</script>
+
+
+  </body>
+</html>
