@@ -8,8 +8,11 @@
 body { background: #555 }
 
 .edo12 { background: grey; }
+.edo24 { background: #aaa; }
 .edo22 { background: green; }
-.edo10 { background: skyblue; }
+.edo11 { background: #9e9; }
+.edo10 { background: #aaf; }
+.edo5 { background: skyblue; }
 .notes { 
   width: 1000px;
   display: flex;
@@ -33,11 +36,20 @@ body { background: #555 }
       <div class="notes edo12">
         <div>C</div> <div>C#/Db</div> <div>D</div> <div>D#/Eb</div> <div>E</div> <div>F</div> <div>F#/Gb</div> <div>G</div> <div>G#/Ab</div> <div>A</div> <div>A#/Bb</div> <div>B</div>
       </div>
+      <div class="notes edo24">
+        <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div> <div>11</div> <div>12</div> <div>13</div> <div>14</div> <div>15</div> <div>16</div> <div>17</div> <div>18</div> <div>19</div> <div>20</div> <div>21</div> <div>22</div> <div>23</div> <div>24</div> 
+      </div>
       <div class="notes edo22">
         <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div> <div>11</div> <div>12</div> <div>13</div> <div>14</div> <div>15</div> <div>16</div> <div>17</div> <div>18</div> <div>19</div> <div>20</div> <div>21</div> <div>22</div>
       </div>
+      <div class="notes edo11">
+        <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div> <div>11</div>  
+      </div>      
       <div class="notes edo10">
         <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> <div>6</div> <div>7</div> <div>8</div> <div>9</div> <div>10</div>  
+      </div>
+      <div class="notes edo5">
+        <div>1</div> <div>2</div> <div>3</div> <div>4</div> <div>5</div> 
       </div>
     </div>  
 
@@ -57,46 +69,60 @@ function getRandomInt(min, max) {
 }
 
 const synth = new Tone.PolySynth().set({
-                "oscillator" : { "type" : 'triangle' },
+                "oscillator" : { "type" : 'sawtooth' },
                 "envelope" : {
-                  "attack" : 0.005 ,
+                  "attack" : 1,
                   "decay" : 0.1 ,
                   "sustain" : 0.3 ,
-                  "release" : 2,
+                  "release" : 3,
                 },
                 "volume" : 0,
               }).toMaster();
 
-Tone.Transport.bpm.value = 60;
+Tone.Transport.bpm.value = 10;
 
 console.log(Tone.Transport.bpm);
 
 let started = false;
-let division = 22;
+let division = 24;
 let detune = 0;
+let pitchSet = []; // later!
+let steps = [0,1,0,2,0,3,0,4];
+let currentStep = 0;
 
-function setDetune() {
-  const detune = 1200/division * getRandomInt(0, division+1);
+function pickDetune() {
+  detune = 1200/division * getRandomInt(0, division+1);
   console.log('detune', detune);
   synth.detune.value = detune;
-    
+
+}
+function incrementDetune() {
+  detune += 1200/division;
+  if (detune > 1200) { detune = 0 };
+  console.log('detune', detune);
+  synth.detune.value = detune;
+}
+function moveStep() {
+  detune = (1200/division) * steps[currentStep];
+  currentStep++;
+  if (currentStep >= steps.length) { currentStep = 0 };
+  console.log('detune', detune);
+  synth.detune.value = detune;
 }
 
 const startStop = document.getElementById('startstop');
 
 
+//const loop = new Tone.Loop(time => { synth.triggerAttackRelease('C3', '16n') }, "8").start(0);
 
-
-//const loop = new Tone.Loop(time => { synth.triggerAttackRelease('C3', '8n') }, "8").start(0);
-
-Tone.Transport.scheduleRepeat(onRepeat, '4n');
+Tone.Transport.scheduleRepeat(onRepeat, '8n');
 
 function onRepeat(time) {
-  setDetune();
-  synth.triggerAttackRelease('C3', '8n')
-  
+  synth.triggerAttackRelease('C3', 1)
+  pickDetune();
+//  incrementDetune();
+//  moveStep();
 }
-
 
 
 
